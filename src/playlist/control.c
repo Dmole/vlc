@@ -156,7 +156,10 @@ vlc_playlist_SetCurrentMedia(vlc_playlist_t *playlist, ssize_t index)
     input_item_t *media = index != -1
                         ? playlist->items.data[index]->media
                         : NULL;
-    return vlc_player_SetCurrentMedia(playlist->player, media);
+    int ret = vlc_player_SetCurrentMedia(playlist->player, media);
+    if (ret == VLC_SUCCESS)
+        playlist->played_one = true;
+    return ret;
 }
 
 static inline bool
@@ -211,6 +214,10 @@ vlc_playlist_NormalOrderGetNextIndex(vlc_playlist_t *playlist)
         case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
                 if (playlist->items.size == 0)
                     return -1;
+                if (playlist->current == playlist->items.size && !playlist->played_one) {
+                    playlist->repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+                    return -1;
+                }
             return (playlist->current + 1) % playlist->items.size;
         default:
             vlc_assert_unreachable();

@@ -52,6 +52,7 @@ struct vlc_playlist
     playlist_item_vector_t items;
     struct randomizer randomizer;
     ssize_t current;
+    bool played_one;
     bool has_prev;
     bool has_next;
     struct vlc_list listeners; /**< list of vlc_playlist_listener_id.node */
